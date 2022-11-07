@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console RPG", "Console RPG\Console RPG.csproj", "{8F589E0B-710B-4D52-B17F-D5A69D826B7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Methods", "ClassLibrary1\Methods.csproj", "{AECC03C1-2942-45AE-867F-95F72D3942E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F589E0B-710B-4D52-B17F-D5A69D826B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F589E0B-710B-4D52-B17F-D5A69D826B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F589E0B-710B-4D52-B17F-D5A69D826B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F589E0B-710B-4D52-B17F-D5A69D826B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AECC03C1-2942-45AE-867F-95F72D3942E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AECC03C1-2942-45AE-867F-95F72D3942E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AECC03C1-2942-45AE-867F-95F72D3942E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AECC03C1-2942-45AE-867F-95F72D3942E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FAB4E87-64EA-423A-8764-ECF9C080FDB9}
+	EndGlobalSection
+EndGlobal
