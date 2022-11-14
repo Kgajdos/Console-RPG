@@ -1,11 +1,10 @@
 ﻿/*
- * ALL CLASSES ARE INSTANTIATED HERE! NOTHING ELSE SHOULD BE HERE!
- * 
+ * ALL CLASSES ARE INSTANTIATED HERE! 
+ * Remember to add methods that belong to the classes 
  * 
  */
 namespace RPG
 {
-    //Sword class
     public class Sword
     {
         int _damageMod = 0;
@@ -19,6 +18,14 @@ namespace RPG
 
     public class Race
     {
+        //Moved set race function to class, also moved var's it relied on (may be reduntant)
+        public static double _playerHealthStat = 20;
+        public static double _playerDefenseStat = 20;
+        public static double _playerStrengthStat = 20;
+        public static double _playerSpeedStat = 20;
+        public static double _weaponDamageStat = 2;
+        public static int _playerLevel = 1;
+
         string raceName = "";
         double healthModifier = 0;
         double strengthModifier = 0;
@@ -50,30 +57,68 @@ namespace RPG
             get { return strengthModifier; }
             set { strengthModifier = value; }
         }
-    }
-    public class Rat
-    {
-        string _name = "Rat";
-        int _health = 20;
-        int _strength = 5;
-        int _defense = 7;
-        int _speed = 15;
 
-        public int Health { get { return _health; } set { _health = value; } }
-        public int Strength { get { return _strength; } set { _strength = value; } }
-        public int Defense { get { return _defense; } set { _defense = value; } }
-        public int Speed { get { return _speed; } set { _speed = value; } } 
-         
-        //handles the rats attack move
-        public int RatAttack(int Strength, int playerDefense)
+        //Method for setting race, Fixed
+        public static string SetRace(string input)
         {
-            int damage = 0;
-            if (Strength > playerDefense)
+            string race = "";
+            bool inputIsGood = false;
+
+            if (input.ToUpper() == "A" || input.ToUpper() == "B" || input.ToUpper() == "C")
             {
-                damage = Strength - playerDefense;
+                inputIsGood = true;
+            }
+            else inputIsGood = false;
+
+
+            while (inputIsGood == false)
+            {
+                Console.WriteLine("Try again.");
+                input = Console.ReadLine();
+            }
+            switch (input.ToUpper())
+            {
+                case "A":
+                    race = "Human";
+                    _playerHealthStat = _playerHealthStat * 2;
+                    _playerDefenseStat = _playerDefenseStat * 2;
+                    _playerStrengthStat = _playerStrengthStat * 2;
+                    _playerSpeedStat = _playerSpeedStat * 2;
+                    inputIsGood = true;
+                    break;
+
+                case "B":
+                    race = "Elf";
+                    _playerHealthStat = _playerHealthStat * 2.5;
+                    _playerDefenseStat = _playerDefenseStat * 0.5;
+                    _playerStrengthStat = _playerStrengthStat * 0.5;
+                    _playerSpeedStat = _playerSpeedStat * 2.5;
+                    inputIsGood = true;
+                    break;
+
+                case "C":
+                    race = "Dwarf";
+                    _playerHealthStat = _playerHealthStat * 0.5;
+                    _playerDefenseStat = _playerDefenseStat * 2.5;
+                    _playerStrengthStat = _playerStrengthStat * 2.5;
+                    _playerSpeedStat = _playerSpeedStat * 0.5;
+                    inputIsGood = true;
+                    break;
             }
 
-            return damage;
+            return race;
+        }
+        //work around to move stats from race class to player class (after modifications have been set)
+        //
+        public static string[] GetRaceStats()
+        {
+            int playerHealth = (int)_playerHealthStat;
+            int playerDefense = (int)_playerDefenseStat;
+            int playerStrength = (int)_playerStrengthStat;
+            int playerSpeed = (int)_playerSpeedStat;
+            string[] stats = new string[4] {playerDefense.ToString(), playerHealth.ToString(), playerSpeed.ToString(), playerStrength.ToString() };
+
+            return stats;
         }
     }
     public class Player
@@ -85,6 +130,7 @@ namespace RPG
         double strength = 20;
         double defense = 20;
         double speed = 20;
+        int _level = 0;
         string _race = "";
         public Sword _startingWeapon = new Sword();
 
@@ -103,7 +149,7 @@ namespace RPG
             get { return _age; }
             set { _age = value; }
         }
-        public string Race
+        public string PlayerRace
         {
             get { return _race; }
             set { _race = value; }
@@ -128,7 +174,88 @@ namespace RPG
             get { return speed; }
             set { speed = value; }
         }
+        public int Level
+        {
+            get { return _level; }
+            set { _level = value; }
+        }
+        //Method for setting the players stats based on race and player
+        public static double SetStats(double raceInput, double characterInput)
+        {
+            double newStat = characterInput * raceInput;
+            return newStat;
+        }
+        public static void DisplayStats(int playerHealth, int playerDefense, int playerStrength, int playerSpeed)
+        {
+              Console.WriteLine("Health: " + playerHealth + "\n" +
+                    "Defense: " + playerDefense + "\n" + "Strength: " + playerStrength +
+                    "\nSpeed: " + playerSpeed);
+            
+        }
+        //Rest
+        public static int Rest(int currentHealth)
+        {
+            string[] currentStats = Race.GetRaceStats();
+            int playerHealth = int.Parse(currentStats[1]);
+            int output = (int)currentHealth;
+            int healAmount = playerHealth - currentHealth;
+            Console.WriteLine("Your rest has returned " + healAmount + " amount of health.");
+
+            return output;
+        }
+        //players attack - change to int
+
+        public static int Attack(int playerStrength, int enemyDefense, int weaponDamage, int enemyHealth)
+        {
+            int damage = 0;
+
+            if (playerStrength > enemyDefense)
+            {
+                damage = (playerStrength * weaponDamage) / enemyDefense;
+                Console.WriteLine("You did " + damage + " damage!");
+            }
+            return damage;
+        }
+
+        //Level up logic basically a stat multiplier
+        public static double LevelUp(int level)
+        {
+            double output = (int)level * 1.12;
+            return output;
+        }
     }
+    public class Rat
+    {
+        string _name = "Rat";
+        int _health = 20;
+        int _strength = 5;
+        int _defense = 7;
+        int _speed = 15;
+
+        public int Health { get { return _health; } set { _health = value; } }
+        public int Strength { get { return _strength; } set { _strength = value; } }
+        public int Defense { get { return _defense; } set { _defense = value; } }
+        public int Speed { get { return _speed; } set { _speed = value; } }
+
+        //handles the rats attack move
+        public static int RatAttack(int Strength, int playerDefense)
+        {
+            int damage = 0;
+            if (Strength > playerDefense)
+            {
+                damage = Strength - playerDefense;
+            }
+
+            return damage;
+        }
+        public static string Dead()
+        {
+            string output = "With a squeal, the rat dies.";
+
+            return output;
+        }
+    }
+
 
     public class InnKeeper
     {
