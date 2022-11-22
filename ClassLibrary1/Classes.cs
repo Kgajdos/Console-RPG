@@ -8,11 +8,17 @@ namespace RPG
     public class Sword
     {
         int _damageMod = 0;
+        string _name = "";
 
         public int DamageMod
         {
             get { return _damageMod; }
             set { _damageMod = value; }
+        }
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
         }
     }
 
@@ -116,7 +122,7 @@ namespace RPG
             int playerDefense = (int)_playerDefenseStat;
             int playerStrength = (int)_playerStrengthStat;
             int playerSpeed = (int)_playerSpeedStat;
-            string[] stats = new string[4] {playerDefense.ToString(), playerHealth.ToString(), playerSpeed.ToString(), playerStrength.ToString() };
+            string[] stats = new string[4] { playerDefense.ToString(), playerHealth.ToString(), playerSpeed.ToString(), playerStrength.ToString() };
 
             return stats;
         }
@@ -187,10 +193,10 @@ namespace RPG
         }
         public static void DisplayStats(int playerHealth, int playerDefense, int playerStrength, int playerSpeed)
         {
-              Console.WriteLine("Health: " + playerHealth + "\n" +
-                    "Defense: " + playerDefense + "\n" + "Strength: " + playerStrength +
-                    "\nSpeed: " + playerSpeed);
-            
+            Console.WriteLine("Health: " + playerHealth + "\n" +
+                  "Defense: " + playerDefense + "\n" + "Strength: " + playerStrength +
+                  "\nSpeed: " + playerSpeed);
+
         }
         //Rest
         public static int Rest(int currentHealth)
@@ -212,7 +218,9 @@ namespace RPG
             if (playerStrength > enemyDefense)
             {
                 damage = (playerStrength * weaponDamage) / enemyDefense;
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You did " + damage + " damage!");
+                Console.ForegroundColor = ConsoleColor.Gray;
             }
             return damage;
         }
@@ -223,6 +231,8 @@ namespace RPG
             double output = (int)level * 1.12;
             return output;
         }
+
+
     }
     public class Rat
     {
@@ -256,11 +266,64 @@ namespace RPG
         }
     }
 
+    public class Wallet
+    {
+        string cp = "Copper";
+        string sp = "Silver";
+        string gp = "Gold";
+        int copperAvailable = 0;
+        int silverAvailable = 0;
+        int goldAvailable = 0;
 
+        public string Copper
+        {
+            get { return cp; }
+            set { cp = value; }
+        }
+        public string Silver
+        {
+            get { return sp; }
+            set { sp = value; }
+        }
+        public string Gold
+        {
+            get { return gp; }
+            set { gp = value; }
+        }
+        public int CopperAvailable
+        {
+            get { return copperAvailable; }
+            set { copperAvailable += value; }
+        }
+        public int SilverAvailable
+        {
+            get { return silverAvailable; }
+            set { silverAvailable = value; }
+        }
+        public int GoldAvailable
+        {
+            get { return goldAvailable; }
+            set { goldAvailable = value; }
+        }
+        //Function to display wallet
+        public static void playerMonies(int copper, int silver, int gold)
+        {
+            string output = "Copper: " + copper + "\n" +
+                "Silver: " + silver + "\n" + "Gold: " + gold;
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(output);
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+    }
     public class InnKeeper
     {
         string _name = "";
         int _age = 0;
+        string _dialog = "";
+        List<string> ShopInv = new List<string>
+        { };
 
         public string Name
         {
@@ -272,12 +335,46 @@ namespace RPG
             get { return _age; }
             set { _age = value; }
         }
+        public string Dialog
+        {
+            get { return _dialog; }
+            set { _dialog = value; }
+        }
+        public List<string> ShopInventory
+        {
+            get { return ShopInv; }
+            set { ShopInv = value; }
+        }
+        //Delivers an array of possible dialog, then randomly selects one.
+        public static string ListOfDialog()
+        {
+            string output = "";
+            string[] possibleDialog = new string[5] {"'Hello there.'\n", "'How can I help you?'\n",
+            "'Do you need something?'\n", "'How can I be of assistance?'\n", "'Come to chat?'\n"};
+
+            Random randomDialog = new Random();
+            int rnd = randomDialog.Next(possibleDialog.Length);
+            output = possibleDialog[rnd];
+
+            return output;
+        }
+        /* DOESN'T WORK, NEED TO FIGURE THIS OUT
+        public static List<string> GetInventory()
+        {
+            string output = "";
+
+            foreach(ShopInventory in Inkeeper)
+        }
+        */
     }
     //Room class for the room the player is standing in
     public class Room
     {
+        //_roomNumber is how the player will move to and from each room
         string _details = "";
         string _NPC = "";
+        int _roomNumber = 0;
+        List<string> Loot = new List<string> { };
 
         public string NPC
         {
@@ -289,6 +386,16 @@ namespace RPG
         {
             get { return _details; }
             set { _details = value; }
+        }
+        public int RoomNumber
+        {
+            get { return _roomNumber; }
+            set { _roomNumber = value; }
+        }
+        public List<string> LootInventory
+        {
+            get { return Loot; }
+            set { Loot = value; }
         }
     }
 

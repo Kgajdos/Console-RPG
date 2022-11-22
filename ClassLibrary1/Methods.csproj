@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="ClassLibrary1">
+      <HintPath>obj\Debug\net6.0\ClassLibrary1.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
