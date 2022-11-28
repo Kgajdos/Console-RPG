@@ -54,10 +54,10 @@ namespace RPG
         //Code that handes the main program 
         static void Main()
         {
-            //beginning save/load logic
-            if (!Directory.Exists("saves"))
+            //beginning save/load logic 
+            if (!Directory.Exists(@"C:\Users\Veteran\OneDrive\Documents\School\CISS 222\Kevin_Gajdos_Personal_Project_Text_Adventure\Console RPG\Console RPG\bin\Debug\net6.0\saves"))
             {
-                Directory.CreateDirectory("saves");
+                Directory.CreateDirectory(@"C:\Users\Veteran\OneDrive\Documents\School\CISS 222\Kevin_Gajdos_Personal_Project_Text_Adventure\Console RPG\Console RPG\bin\Debug\net6.0\saves");
             }
             Load(out bool newP);
             if (newP == true)

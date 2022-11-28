@@ -7,6 +7,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace RPG
 {
+    [Serializable]
     public class Sword
     {
         int _damageMod = 0;
@@ -23,7 +24,7 @@ namespace RPG
             set { _name = value; }
         }
     }
-
+    [Serializable]
     public class Race
     {
         //Moved set race function to class, also moved var's it relied on (may be reduntant)
@@ -274,7 +275,7 @@ namespace RPG
             return output;
         }
     }
-
+    [Serializable]
     public class Wallet
     {
         string cp = "Copper";

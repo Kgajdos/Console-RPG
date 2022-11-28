@@ -718,13 +718,14 @@ namespace RPG
 
         }
 
-        /* Save and Load functions were developed using a tutorial found here:
+        /* Save and Load functions were developed (not a one for one copy!) using a tutorial found here:
          * https://www.youtube.com/watch?v=RcWnm-1sLyo
          */
 
         public static void Save()
         {
             BinaryFormatter binForm = new BinaryFormatter();
+            //will i be changing the path down here on path?
             string path = "saves/" + player.SaveID.ToString();
             FileStream file = File.Open(path, FileMode.OpenOrCreate);
             //creates an issue cannot serialize the sword
