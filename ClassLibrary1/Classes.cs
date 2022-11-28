@@ -3,6 +3,8 @@
  * Remember to add methods that belong to the classes 
  * 
  */
+using System.Reflection.Metadata.Ecma335;
+
 namespace RPG
 {
     public class Sword
@@ -127,6 +129,7 @@ namespace RPG
             return stats;
         }
     }
+    [Serializable]
     public class Player
     {
 
@@ -137,6 +140,7 @@ namespace RPG
         double defense = 20;
         double speed = 20;
         int _level = 0;
+        int saveID = 0;
         string _race = "";
         public Sword _startingWeapon = new Sword();
 
@@ -184,6 +188,11 @@ namespace RPG
         {
             get { return _level; }
             set { _level = value; }
+        }
+        public int SaveID
+        {
+            get { return saveID; }
+            set { saveID = value; }
         }
         //Method for setting the players stats based on race and player
         public static double SetStats(double raceInput, double characterInput)

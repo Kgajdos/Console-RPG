@@ -23,7 +23,15 @@
  *Author: Kevin Gajdos
  *
  */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using static RPG.Methods;
+
 
 namespace RPG
 {
@@ -32,6 +40,8 @@ namespace RPG
         //User global commands, needs work
         public static bool playerAttackCommand = false;
         public static string attack = "attack";
+        public static bool tutorial = false;
+        
         public static void PlayerCommands()
         {
             if (Console.ReadLine() == attack)
@@ -44,11 +54,21 @@ namespace RPG
         //Code that handes the main program 
         static void Main()
         {
-            //get the player ready for the game, give them tips and help here before we start.
-            Help("You are about to enter the old world of Lemorea. There are many dangers here, only the bravest can survive.\n" +
-                "If you're ready, press ENTER.");
-            Console.ReadLine();
-            StartUp();
+            //beginning save/load logic
+            if (!Directory.Exists("saves"))
+            {
+                Directory.CreateDirectory("saves");
+            }
+            Load(out bool newP);
+            if (newP == true)
+            {
+                tutorial = Tutorial();
+            }else
+            {
+                tutorial = true;
+            }
+            
+            
 
             Wallet playerWallet = new Wallet();
             playerWallet.CopperAvailable = 0;
@@ -80,7 +100,7 @@ namespace RPG
             }
 
             //First mission, player will level up after this
-            bool tutorial = Tutorial();
+            
             if (tutorial == true)
             {
                 Dialog("'As promised, here's your copper." + "\n");

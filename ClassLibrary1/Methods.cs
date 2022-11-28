@@ -4,6 +4,8 @@
  * 
  */
 
+using System.Runtime.Serialization.Formatters.Binary;
+
 namespace RPG
 {
 
@@ -93,8 +95,10 @@ namespace RPG
             Console.WriteLine("What do you want to do?");
             Help("Command structure must be COMMAND OBJECT (OBJECT being whatever you want to interact with).");
             Help("Example: GRAB MUG");
-            Console.Write("List of available commands:\n"
+            Console.WriteLine("List of available commands:\n"
                 + "TALK\nLOOK\nGRAB\nSTATS\nINVENTORY\n");
+            //Keeps save and quit at the bottom
+            Console.WriteLine("SAVE\nQUIT");
             string userCommand = Console.ReadLine().ToUpper();
             string[] emptySpace = new string[1] { " " };
             string[] newCommand = userCommand.Split(emptySpace, 2, StringSplitOptions.None);
@@ -136,7 +140,15 @@ namespace RPG
                             validAnswer = true;
                         }
                         break;
-                    //Bug fixed, do NOT change validAnswer to false
+                        //these two should remain at the bottom
+                    case "SAVE":
+                        Save();
+                        break;
+                    case "QUIT":
+                        Environment.Exit(0);
+                        break;
+
+                    //Bug fixed, do NOT change validAnswer to false (creates infinite loop otherwise)
                     default:
                         Help("Please choose a valid answer.");
                         validAnswer = true;
@@ -229,8 +241,12 @@ namespace RPG
 
         //Code instantiating the player and setting the stats
         public static Player player = new Player();
-        public static void StartUp()
+        static Player StartUp(int playerID)
         {
+            //get the player ready for the game, give them tips and help here before we start.
+            Help("You are about to enter the old world of Lemorea. There are many dangers here, only the bravest can survive.\n" +
+                "If you're ready, press ENTER.");
+            Console.ReadLine();
             Dialog("'Welcome to Lemorea, weary traveller. There's a blizzard outside, why don't you sit down and enjoy the fire. \n" +
                "I'm Ceveil, what's your name?'");
             Console.WriteLine();
@@ -252,6 +268,7 @@ namespace RPG
             player.Name = tempName;
             player.Age = tempAge;
             player.PlayerRace = race;
+            player.SaveID = playerID;
 
             Race playerRace = new Race();
             playerRace.RaceName = race;
@@ -293,6 +310,7 @@ namespace RPG
             player.Defense = Player.SetStats(playerRace.DefenseModifier, player.Defense);
             player.Speed = Player.SetStats(playerRace.SpeedModifier, player.Speed);
             player.Level = 1;
+            return player;
         }
         /*
          *------------------------------------------------------/
@@ -645,6 +663,7 @@ namespace RPG
                             player.Level = 2;
                             validResponse = true;
                             return tutorialComplete;
+
                         }
                         break;
                     case "B":
@@ -696,6 +715,103 @@ namespace RPG
             rat2.Strength = 9;
             rat3.Strength = 11;
 
+
+        }
+
+        /* Save and Load functions were developed using a tutorial found here:
+         * https://www.youtube.com/watch?v=RcWnm-1sLyo
+         */
+
+        public static void Save()
+        {
+            BinaryFormatter binForm = new BinaryFormatter();
+            string path = "saves/" + player.SaveID.ToString();
+            FileStream file = File.Open(path, FileMode.OpenOrCreate);
+            //creates an issue cannot serialize the sword
+            binForm.Serialize(file, player);
+            file.Close();
+        }
+        public static Player Load(out bool newP) 
+        {
+            newP = false;
+            string[] paths = Directory.GetFiles("saves");
+            List<Player> Players = new List<Player>();
+            int idCount = 0;
+
+            BinaryFormatter binForm = new BinaryFormatter();
+            foreach ( string p in paths ) 
+            { 
+                FileStream file = File.Open(p, FileMode.Open);
+                Player tempPlayer = (Player)binForm.Deserialize(file);
+                file.Close();
+                Players.Add(tempPlayer);
+            }
+
+
+            idCount = Players.Count;
+
+            while(true)
+            {
+                Console.Clear();
+                Help("Choose your save: ");
+
+                foreach (Player p in Players)
+                {
+                    Console.WriteLine(p.SaveID + ": " + p.Name);
+                }
+                Help("Please input player name or id (id:# or player name). Or, 'create' will start a new save.");
+
+                string[] input = Console.ReadLine().Split(':');
+
+                try
+                {
+                    if (input[0] == "id")
+                    {
+                        if (int.TryParse(input[1], out int id))
+                        {
+                            foreach (Player player in Players)
+                            {
+                                if (player.SaveID == id)
+                                {
+                                    return player;
+                                }
+                            }
+                            Console.WriteLine("There is no player with that id.");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Your id needs to be a number. Press any key to continue.");
+                            Console.ReadKey();
+                        }
+                    }
+                    else if (input[0] == "create")
+                    {
+                        //
+                        Player newPlayer = StartUp(idCount);
+                        newP = true;
+                        return newPlayer;
+                    }
+                    else
+                    {
+                        foreach (Player player in Players)
+                        {
+                            if (player.Name == input[0])
+                            {
+                                return player;
+                            }
+                            Console.WriteLine("There's no player with that name.");
+                            Console.ReadKey();
+                        }
+                    }
+                }
+                catch(IndexOutOfRangeException)
+                {
+                    Console.WriteLine("Your id needs to be a number. Press any key to continue.");
+                    Console.ReadKey();
+                }
+            }
+            
 
         }
     }
