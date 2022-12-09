@@ -12,6 +12,8 @@ namespace RPG
     {
         int _damageMod = 0;
         string _name = "";
+        //swords will roll a 1-6 (think D&D) to hit, that number will need to be tested against the oponents defense
+        Random swordAttack = new Random();
 
         public int DamageMod
         {
@@ -22,6 +24,16 @@ namespace RPG
         {
             get { return _name; }
             set { _name = value; }
+        }
+        //True/False function to determine if a hit has happened
+        public static bool SwordAttack(int attackResult, int enemyDefense)
+        {
+            bool hitResult = false;
+            if (attackResult > enemyDefense)
+            {
+                hitResult = true;
+            }
+            return hitResult;
         }
     }
     [Serializable]
@@ -143,7 +155,9 @@ namespace RPG
         int _level = 0;
         int saveID = 0;
         string _race = "";
+        Wallet _playerWallet = new Wallet();
         public Sword _startingWeapon = new Sword();
+        Inventory _playerInventory = new Inventory();
 
         public Sword StartingWeapon
         {
@@ -189,6 +203,16 @@ namespace RPG
         {
             get { return _level; }
             set { _level = value; }
+        }
+        public Wallet PlayerWallet
+        {
+            get { return _playerWallet; }
+            set { _playerWallet = value; }
+        }
+        public Inventory PlayerInventoy
+        {
+            get { return _playerInventory; }
+            set { _playerInventory = value; }
         }
         public int SaveID
         {
@@ -243,6 +267,21 @@ namespace RPG
         }
 
 
+    }
+    public class Inventory
+    {
+        public static List<string> _playerInventory = new List<string>();
+
+        internal void Add(string itemAdded)
+        {
+            PlayerInventory.Add(itemAdded);
+        }
+
+        public static List<string> PlayerInventory
+        {
+            get { return _playerInventory; }
+            set { _playerInventory = value; }
+        }
     }
     public class Rat
     {
@@ -315,6 +354,27 @@ namespace RPG
             get { return goldAvailable; }
             set { goldAvailable = value; }
         }
+        public static Wallet AddToPlayerWallet(Wallet playerWallet, int moniesIncoming, string coinType)
+        {
+            playerWallet.CopperAvailable = 0;
+            playerWallet.SilverAvailable = 0;
+            playerWallet.GoldAvailable = 0;
+            switch (coinType)
+            {
+                case "copper":
+                    playerWallet.CopperAvailable += moniesIncoming;
+                    break;
+                case "silver":
+                    playerWallet.SilverAvailable += moniesIncoming;
+                    break;
+                case "gold":
+                    playerWallet.GoldAvailable += moniesIncoming;
+                    break;
+                default:
+                    break;
+            }
+            return playerWallet;
+        }
         //Function to display wallet
         public static void playerMonies(int copper, int silver, int gold)
         {
@@ -334,6 +394,7 @@ namespace RPG
         string _dialog = "";
         List<string> ShopInv = new List<string>
         { };
+        
 
         public string Name
         {
@@ -350,7 +411,7 @@ namespace RPG
             get { return _dialog; }
             set { _dialog = value; }
         }
-        public List<string> ShopInventory
+        public List<string> ShopInventory 
         {
             get { return ShopInv; }
             set { ShopInv = value; }
@@ -368,14 +429,27 @@ namespace RPG
 
             return output;
         }
-        /* DOESN'T WORK, NEED TO FIGURE THIS OUT
-        public static List<string> GetInventory()
+        //method for handling buying items off of a shopkeeper
+        public static void Buy(string item, int cost, string coinType, List<int> playerWallet, List<string> shopInventory, List<string> playerInventory)
         {
-            string output = "";
+            if (shopInventory.Contains(item)) 
+            {
+                Console.WriteLine("Would you like to purchase " + item + " for " + cost + "?");
+                string answer = Methods.AorB(Console.ReadLine());
 
-            foreach(ShopInventory in Inkeeper)
+                if (answer == "A")
+                {
+                    playerInventory.Add(item);
+                    Wallet.AddToPlayerWallet(Methods.player.PlayerWallet, (cost * -1), coinType);
+                }else
+                {
+                    Console.WriteLine("Come again.");
+                }
+            }else
+            {
+                Console.WriteLine(item + " is unavailable");
+            }
         }
-        */
     }
     //Room class for the room the player is standing in
     public class Room
@@ -407,6 +481,32 @@ namespace RPG
             get { return Loot; }
             set { Loot = value; }
         }
-    }
 
+        //Works - this function exists for testing purposes!
+        public static void DisplayList(List<string> roomLoot)
+        {
+            for (int i = 0; i < roomLoot.Count; i++)
+            {
+                Console.WriteLine(roomLoot[i]);
+            }
+        }
+    }
+    //This will likely be changed to it's own database in the future!
+    //For now, it's acting as a "database" of loot and price
+    public class Loot
+    {
+        //setting basic loot and costs
+        public static string ale = "Ale";
+        public static int costAle = 5;
+        public static string bread = "Bread";
+        public static int costBread = 5;
+        public static string healthPotion = "Health Potion";
+        public static int costHealthPot = 50;
+        public static string sheild = "Sheild";
+        public static int costSheild = 75;
+        public static string oldSword = "Rusty Sword";
+        public static int costOldSword = 100;
+        public static string smallHealthPot = "Small Health Potion";
+        public static int costSmallHealthPot = 25;
+    }
 }

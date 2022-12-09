@@ -3,7 +3,11 @@
  * 
  * 
  */
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RPG
@@ -12,13 +16,7 @@ namespace RPG
     public class Methods
     {
         public static double _playerHealthStat = 20;
-        /* THESE ARE COMMENTED OUT TO TEST IF THEY'RE NEEDED!!!!!!
-        public static double _playerDefenseStat = 20;
-        public static double _playerStrengthStat = 20;
-        public static double _playerSpeedStat = 20;
-        public static double _weaponDamageStat = 2;
-        public static int _playerLevel = 1;
-        */
+
 
 
         //This seems reduntant, it exists to ensure that the stat modifiers are added but also shouldn't interfer anymore
@@ -34,13 +32,55 @@ namespace RPG
         }
 
         //Inventory systems work
-        public static List<string> Inventory = new List<string>();
-        //ALL OF THIS IS BEING MOVED TO A WALLET CLASS!
-        public static List<Wallet> WalletList = new List<Wallet> { };
+        //public static List<string> Inventory = new List<string>();
+        //Code instantiating the player and setting the stats
+        public static Player player = new Player();
 
 
+        public static List<string> ReturnPlayerInventory(List<string> playerInventory)
+        {
+            List<string> strings = new List<string>() { };  
 
-        /* DOESN'T WORK, COME BACK TO THIS!
+            for (int i = 0; i < playerInventory.Count; i++)
+            {
+                strings.Add(playerInventory[i]);
+            }
+            return strings;
+        }
+        
+        public static Room SpawnRoom(string roomDetails, string npcInCharge, int roomNumber, string[] lootAvailable)
+        {
+            //creates a room based off input
+            Room newRoom = new Room();
+            newRoom.Details = roomDetails;
+            newRoom.NPC = npcInCharge;
+            newRoom.RoomNumber = 1;
+
+            for (int i = 0; i < lootAvailable.Length; i++)
+            {
+                newRoom.LootInventory.Add(lootAvailable[i]);
+            }
+            return newRoom;
+        }
+        public static InnKeeper SpawnInnkeeper(string innKeeperName, int innKeeperAge, string[] shopInventory)
+        {
+            InnKeeper newInnkeeper = new InnKeeper();
+            newInnkeeper.Name = innKeeperName;
+            newInnkeeper.Age = innKeeperAge;
+            newInnkeeper.ShopInventory = new List<string> { };
+
+            for (int i = 0; i < shopInventory.Length; i++)
+            {
+                newInnkeeper.ShopInventory.Add(shopInventory[i]);
+            }
+
+            newInnkeeper.ShopInventory.Add(Loot.smallHealthPot);
+            newInnkeeper.ShopInventory.Add(Loot.sheild);
+
+            return newInnkeeper;
+        }
+
+        /* DOESN'T WORK, COME BACK TO THIS! - Was not able to fix in time
         //Gets the price of an item
         public static int PriceGrab(string input)
         {
@@ -89,17 +129,19 @@ namespace RPG
         }
 
         //user commands logic, maybe (http://pont.ist/micropuzzle/ -- got help from this site, code is still mostly my own though)
-        public static bool UserCommand(string roomDetails, List<string> roomLoot)
+        public static bool UserCommand(string roomDetails, List<string> roomLoot, InnKeeper innKeeper)
         {
             bool breakingOut = false;
             Console.WriteLine("What do you want to do?");
             Help("Command structure must be COMMAND OBJECT (OBJECT being whatever you want to interact with).");
-            Help("Example: GRAB MUG");
+            Help("Example: grab mug");
             Console.WriteLine("List of available commands:\n"
-                + "TALK\nLOOK\nGRAB\nSTATS\nINVENTORY\n");
+                + "TALK\nLOOK\nGRAB\nSTATS\nINVENTORY\n"
+                + "SAVE\nQUIT");
             //Keeps save and quit at the bottom
             Console.WriteLine("SAVE\nQUIT");
             string userCommand = Console.ReadLine().ToUpper();
+            Console.WriteLine("");
             string[] emptySpace = new string[1] { " " };
             string[] newCommand = userCommand.Split(emptySpace, 2, StringSplitOptions.None);
             bool validAnswer = false;
@@ -112,6 +154,44 @@ namespace RPG
                     //objects class!)
                     case "TALK":
                         Dialog(InnKeeper.ListOfDialog().ToString());
+                        Console.WriteLine();
+
+                        /* THIS NEEDS TO BE MOVED!! THE CODE IS VALUABLE THOUGH!!
+                        Dialog("Would you like to check out my wares?" + "\n");
+                        Console.WriteLine("A: Yes\n" + "B: No");
+                        bool correctResponse = false;
+                        string playerResponse = AorB(Console.ReadLine());
+                        while (correctResponse == false)
+                        {
+                            switch (playerResponse)
+                            {
+                                case "A":
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    for (int i = 0; i < innKeeper.ShopInventory.Count; i++) //This line gave me way more trouble than it's worth
+                                    {
+                                        Console.WriteLine(innKeeper.ShopInventory[i]);
+                                    }
+                                    Console.ResetColor();
+                                    correctResponse = true;
+                                    break;
+                                case "B":
+                                    Dialog("Ok then.\n");
+                                    correctResponse = true;
+                                    break;
+                                default:
+                                    Console.WriteLine("Civeil waits patiently for your response.\n");
+                                    correctResponse = false;
+                                    break;
+                            }
+                        }
+                        */
+
+                        //Allows the player to choose who to talk to if there's more than one npc in the room
+                        if (newCommand[1] != null)
+                        {
+                            Console.WriteLine("Not yet Implemented, sorry :'(");
+                            validAnswer = true;
+                        }
                         validAnswer = true;
                         breakingOut = true;
                         break;
@@ -121,17 +201,22 @@ namespace RPG
                         break;
                     //Need to create logic that determines what's being grabbed
                     case "GRAB":
-                        Inventory.Add(newCommand[1]);
+                        //string[] addedItem = new string Grab(newCommand[1], );
+                        string grabbedItem = Grab(newCommand[1], roomLoot) ;
+                        player.PlayerInventoy.Add(grabbedItem);
                         validAnswer = true;
                         break;
                     case "STATS":
                         DisplayStats();
+                        Help("Coins:");
+                        Wallet.playerMonies(player.PlayerWallet.CopperAvailable, player.PlayerWallet.SilverAvailable, player.PlayerWallet.GoldAvailable);
                         validAnswer = true;
                         break;
                     case "INVENTORY":
-                        if (Inventory.Count > 0)
+                        if (Inventory.PlayerInventory.Count > 0)
                         {
-                            Inventory.ForEach(Console.WriteLine);
+                            List<string> playerInventory = ReturnPlayerInventory(Inventory.PlayerInventory);
+                                ItemsandObjects(playerInventory);
                             validAnswer = true;
                         }
                         else
@@ -140,7 +225,12 @@ namespace RPG
                             validAnswer = true;
                         }
                         break;
-                        //these two should remain at the bottom
+                    case "BUY":
+
+                    case "GOTO":
+                        //This is how travel will be handled
+
+                    //these two should remain at the bottom
                     case "SAVE":
                         Save();
                         break;
@@ -209,11 +299,13 @@ namespace RPG
             string scenary = roomDetails;
             Console.WriteLine(roomDetails);
             Console.WriteLine("The items available to grab are:");
+            Console.ForegroundColor= ConsoleColor.Green;
             for (int i = 0; i < roomLoot.Count(); i++)
             {
                 Console.WriteLine(roomLoot[i]);
             }
-
+            Console.WriteLine("");
+            Console.ResetColor();
             return scenary;
         }
         //Display Player Stats
@@ -223,7 +315,7 @@ namespace RPG
                 "Age: " + player.Age + "\n" + "Health: " + player.Health + "\n" + "Strength: " + player.Strength + "\n" +
                 "Defense: " + player.Defense + "\n" + "Speed: " + player.Speed + "\n" + "Weapon: " + player.StartingWeapon.Name + "\n" +
                 "Level: " + player.Level;
-            Help(stats);
+            Help(stats + "\n");
         }
 
         //Run away logic
@@ -239,8 +331,7 @@ namespace RPG
             return result;
         }
 
-        //Code instantiating the player and setting the stats
-        public static Player player = new Player();
+
         static Player StartUp(int playerID)
         {
             //get the player ready for the game, give them tips and help here before we start.
@@ -312,16 +403,6 @@ namespace RPG
             player.Level = 1;
             return player;
         }
-        /*
-         *------------------------------------------------------/
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         */
 
         //Player health logic
         public static void HealthPlusorMinus(double damage)
@@ -344,21 +425,6 @@ namespace RPG
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
         }
-        //Attack hit or not function// THIS MAY GET REMOVED!/////////////
-        public static int DamageCalc(int attackerStrength, int defenderDefense, int attackerHealth, int defenderHealth)
-        {
-            bool itHit = false;
-            int damageTaken = 0;
-            if (attackerStrength > defenderDefense)
-            {
-                itHit = true;
-            }
-            if (itHit == true)
-            {
-                damageTaken = attackerStrength - defenderDefense;
-            }
-            return damageTaken;
-        }
         //Method for forcing all user entered data to uppercase. Might be reduntant but was running into issues otherwise
         public static string ToUpperCase(string input)
         {
@@ -366,55 +432,48 @@ namespace RPG
 
             return output;
         }
-        //Code Pulled from Microsofts Help Page------
-        /*
-         * ------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         */
+        //Code Pulled from Microsofts Help Page------ and now I know that it doesn't do anything
         private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             throw new NotImplementedException();
         }
-        //--------End of code pulled from Microsoft.
-        /*
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         *------------------------------------------------------/ 
-         */
-
         //yes no logic will either spit out a cap A/B or a not Correct response
         public static string AorB(string input)
         {
             string output = "";
             string test = input.ToUpper();
+            bool goodInput = false;
 
-            switch (test)
+            while (goodInput == false)
             {
-                case "A":
-                    output = "A";
-                    break;
-                case "B":
-                    output = "B";
-                    break;
-                default:
-                    output = "Not Correct";
-                    break;
+                switch (test)
+                {
+                    case "A":
+                        output = "A";
+                        goodInput = true;
+                        break;
+                    case "B":
+                        output = "B";
+                        goodInput = true;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             return output;
         }
-
+        //Cause I like to be fancy
+        public static void ItemsandObjects(List<string> input)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            
+            for (int i = 0; i < input.Count; i++)
+            {
+                Console.WriteLine(input[i]);
+            }
+            Console.ResetColor();
+        }
         public static void Dialog(string message)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -422,7 +481,8 @@ namespace RPG
             Console.ResetColor();
         }
 
-        //Tutorial Quest
+        public static bool tutorial = false;
+        //Tutorial Quest --    WILL NEED A REWRITE, THIS IS NOT GOOD!
         public static bool Tutorial()
         {
             bool tutorialComplete = false;
@@ -430,7 +490,8 @@ namespace RPG
             Dialog("'Why don't you hold onto this old sword of mine.' \n");
             Console.WriteLine("Civeil hands you a sword, it is covered with minor scratches and dents.");
             //added sword to inventory
-            Inventory.Add("Sword");
+            Inventory.PlayerInventory.Add("Sword");
+           // Console.WriteLine(Inventory);
             player.StartingWeapon = new Sword();
             player.StartingWeapon.DamageMod = 2;
             player.StartingWeapon.Name = "Old Sword";
@@ -446,8 +507,8 @@ namespace RPG
                 case "A":
                     Dialog("'Great!'\n");
                     Console.WriteLine("Civeil hands you a torch, and a match to light it.");
-                    Inventory.Add("Torch");
-                    Inventory.Add("Match");
+                    Inventory.PlayerInventory.Add("Torch");
+                    Inventory.PlayerInventory.Add("Match");
                     _startQuest = true;
                     break;
                 case "B":
@@ -517,8 +578,8 @@ namespace RPG
                     {
                         case "A":
                             int damage = Player.Attack((int)player.Strength, rat1.Defense, (int)player.StartingWeapon.DamageMod, rat1.Health);
-
                             rat1.Health = rat1.Health - damage;
+                            HealthPlusorMinus(damageTaken);
                             if (rat1.Health <= 10)
                             {
                                 Console.WriteLine("The rat is bloodied and looks tired.");
@@ -530,14 +591,15 @@ namespace RPG
                             bool ratAlive = true;
                             while (ratAlive == true)
                             {
-                                Console.WriteLine("Attack again? Y/N");
+                                Console.WriteLine("Attack again?\n" + "A:Yes\nB:No");
                                 string yOrN = Console.ReadLine().ToUpper();
-                                switch (yOrN)
+                                switch (yOrN.ToLower())
                                 {
-                                    case "Y":
+                                    case "a":
 
                                         int anotherAttack = Player.Attack((int)player.Strength, rat1.Defense, (int)player.StartingWeapon.DamageMod, rat1.Health);
                                         rat1.Health = rat1.Health - anotherAttack;
+                                        HealthPlusorMinus(damageTaken);
                                         if (rat1.Health <= 10)
                                         {
                                             Console.WriteLine("The rat is bloodied and looks tired.");
@@ -583,7 +645,7 @@ namespace RPG
 
 
                             break;
-                        case "B":
+                        case "b":
                             bool runSuccess = RunAway(player.Speed, (int)rat1.Speed);
                             if (runSuccess == true)
                             {
@@ -628,7 +690,7 @@ namespace RPG
                     }
                 }
 
-                //still working on this
+                
                 switch (playerResponse)
                 {
                     case "A":
@@ -650,6 +712,20 @@ namespace RPG
                             Console.WriteLine("\nYou light your torch and throw it on the nest.\nThe room fills with acrid smoke." +
                              "\nYou return upstairs.");
                             ratsNestDestroyed = true;
+
+
+                            
+
+                            //Tutorial rewards, level up move this into tutoral stuffs
+                            Wallet.AddToPlayerWallet(player.PlayerWallet, 25, "copper");
+                            player.Level = 2;
+                            int statMulti = (int)Player.LevelUp(player.Level);
+                            player.Health = player.Health * statMulti;
+                            player.Defense = player.Defense * statMulti;
+                            player.Speed = player.Speed * statMulti;
+                            player.Strength = player.Strength * statMulti;
+                            Console.WriteLine("You gained a level!");
+
                             tutorialComplete = true;
                         }
                         else
@@ -659,6 +735,8 @@ namespace RPG
                         if (ratsNestDestroyed == true)
                         {
                             Dialog("'Welcome back, judging by that smell, I'd say you were successful.'" + "\n");
+                            Dialog("'As promised, here's your copper." + "\n");
+                            Console.WriteLine("Civeil hands you 25 copper. You place it in your inventory.");
                             //behind the scenes info
                             player.Level = 2;
                             validResponse = true;
@@ -683,6 +761,27 @@ namespace RPG
             return tutorialComplete;
 
         }
+        //First receives the item the player typed in, then the available loot in the room,
+        //if it's available, it will return to the player - Functioning
+        public static string Grab(string itemGrab, List<string> roomLoot)
+        {
+            string itemAdded = "";
+            string[] arrayOfRoomLoot = new string[roomLoot.Count];
+            for (int i = 0; i < roomLoot.Count; i++)
+            {
+                arrayOfRoomLoot[i] = roomLoot[i].ToUpper();
+            }
+            if (arrayOfRoomLoot.Contains(itemGrab))
+            {
+                itemAdded = itemGrab;
+            }
+            else
+            {
+                Console.WriteLine(itemGrab + " is not an available item.");
+                
+            }
+            return itemAdded;
+        }
         //Second "dungeon"
         public static void Forest()
         {
@@ -697,7 +796,7 @@ namespace RPG
             Forest.Details = "The trees here are overgrown and old. You struggle to see more than twenty feet in front of you.\n" +
                 "Firns and other small bushes cover the ground, even growing over fallen trees.\n" +
                 "There are three rats wandering around, they don't seem to be interested in you.\n";
-            UserCommand(Forest.Details, Forest.LootInventory);
+           // UserCommand(Forest.Details, Forest.LootInventory);
             //Spawn 3 enemies (will need to add attack logic to them)
             Rat rat1 = new Rat();
             Rat rat2 = new Rat();
@@ -721,27 +820,28 @@ namespace RPG
         /* Save and Load functions were developed (not a one for one copy!) using a tutorial found here:
          * https://www.youtube.com/watch?v=RcWnm-1sLyo
          */
-
+        //save will cause some sort of memory leak, look into this!
         public static void Save()
         {
             BinaryFormatter binForm = new BinaryFormatter();
             //will i be changing the path down here on path?
-            string path = "saves/" + player.SaveID.ToString();
+            string path = @"C:\Users\Veteran\Desktop\Lemoria\Lemoria vs 1.11\Console RPG\Console RPG\bin\Debug\saves/" + player.SaveID.ToString();
             FileStream file = File.Open(path, FileMode.OpenOrCreate);
             //creates an issue cannot serialize the sword
             binForm.Serialize(file, player);
             file.Close();
         }
-        public static Player Load(out bool newP) 
+
+        public static Player Load(out bool newP)
         {
             newP = false;
-            string[] paths = Directory.GetFiles("saves");
+            string[] paths = Directory.GetFiles(@"C:\Users\\Veteran\Desktop\Lemoria\Lemoria vs 1.11\Console RPG\Console RPG\\bin\Debug\saves");
             List<Player> Players = new List<Player>();
             int idCount = 0;
 
             BinaryFormatter binForm = new BinaryFormatter();
-            foreach ( string p in paths ) 
-            { 
+            foreach (string p in paths)
+            {
                 FileStream file = File.Open(p, FileMode.Open);
                 Player tempPlayer = (Player)binForm.Deserialize(file);
                 file.Close();
@@ -751,7 +851,7 @@ namespace RPG
 
             idCount = Players.Count;
 
-            while(true)
+            while (true)
             {
                 Console.Clear();
                 Help("Choose your save: ");
@@ -806,13 +906,13 @@ namespace RPG
                         }
                     }
                 }
-                catch(IndexOutOfRangeException)
+                catch (IndexOutOfRangeException)
                 {
                     Console.WriteLine("Your id needs to be a number. Press any key to continue.");
                     Console.ReadKey();
                 }
             }
-            
+
 
         }
     }
